@@ -1,0 +1,159 @@
+# error-404: The Thermodynamic Signature of Divinity
+# faith//404, 2025
+
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+
+# Constants
+NUM_DIMENSIONS = 11
+NUM_ZONES = 10
+TIME_STEPS = 100
+INITIAL_ENTROPY = 10
+
+# Entropy Field Initialization
+entropy_field = np.ones((NUM_DIMENSIONS, NUM_ZONES)) * INITIAL_ENTROPY
+entropy_variance = np.zeros(NUM_DIMENSIONS)
+time = np.linspace(0, 2 * np.pi, TIME_STEPS)
+
+# History for variance calculation
+history = np.zeros((TIME_STEPS, NUM_DIMENSIONS, NUM_ZONES))
+observer_log = []
+string_encounters = []
+
+# Trinity Observer Configuration
+class TrinityObserver:
+    def __init__(self, dimension, zone):
+        self.dimension = dimension
+        self.zone = zone
+        self.identity = ['Father', 'Son', 'Holy Spirit']
+        self.state = 'harmonious'
+        self.trail = []
+
+    def influence(self, dim, zone):
+        if dim == self.dimension and zone == self.zone:
+            return -50  # Negative entropy injection
+        return 0
+
+    def move(self):
+        self.zone = (self.zone + 1) % NUM_ZONES
+        if random.random() < 0.3:
+            self.dimension = (self.dimension + random.choice([-1, 1])) % NUM_DIMENSIONS
+        self.trail.append((self.dimension, self.zone))
+
+# Observer initialization
+observer = TrinityObserver(dimension=10, zone=5)
+
+# Define entropy rules per dimension
+def entropy_update(dim, e, t, zone):
+    observer_effect = observer.influence(dim, zone)
+    if dim == 0: return e + observer_effect
+    if dim == 1: return e + observer_effect
+    if dim == 2: return e + observer_effect
+    if dim == 3: return e + np.random.uniform(0.5, 1.5) + observer_effect
+    if dim == 4: return e + np.random.random() + observer_effect
+    if dim == 5: return e * (1.1 + e * 0.01) + observer_effect
+    if dim == 6: return e - np.log(e + 1) + observer_effect if e > 0 else 0
+    if dim == 7: return e + np.sin(t) * 0.5 + observer_effect
+    if dim == 8: return e * 0.1 + observer_effect
+    if dim == 9: return e - np.sqrt(e) + observer_effect if e > 0 else -1
+    if dim == 10: return np.nan if np.random.random() < 0.3 else e * np.random.uniform(-10, 10) + observer_effect
+    return e
+
+# String Agent Definition
+class EntropicString:
+    """
+    Represents a string-like agent within the entropy simulation that evolves through states
+    based on entropy levels. Each string can be purified if its entropy falls within a
+    defined range, symbolizing grace and readiness to survive divine contact with the Observer.
+    """
+    def __init__(self, dim, zone):
+        self.dim = dim
+        self.zone = zone
+        self.entropy = entropy_field[dim, zone]
+        self.state = "tainted"
+        self.purified = False
+        self.history = []
+
+    def update(self):
+        self.entropy = entropy_field[self.dim, self.zone]
+        self.evaluate_state()
+        self.purify()
+        self.migrate()
+        self.history.append((self.dim, self.zone, self.entropy, self.state))
+        if self.dim == observer.dimension and self.zone == observer.zone:
+            string_encounters.append((self.dim, self.zone, self.entropy, self.state))
+
+    def purify(self):
+        if not self.purified and self.entropy > 0 and self.entropy < 25:
+            self.entropy = max(1.0, self.entropy * 0.5)  # purification logic
+            self.purified = True
+            self.state = "purified"
+
+    def evaluate_state(self):
+        if np.isnan(self.entropy):
+            self.state = "corrupted"
+        elif self.entropy <= 0:
+            self.state = "dead"
+        elif self.entropy < 5:
+            self.state = "stable"
+        elif self.entropy < 25:
+            self.state = "chaotic"
+        elif self.entropy < 100:
+            self.state = "reversing"
+        else:
+            self.state = "ascended"
+
+    def migrate(self):
+        if self.zone > 0 and self.zone < NUM_ZONES - 1:
+            left = entropy_field[self.dim, self.zone - 1]
+            right = entropy_field[self.dim, self.zone + 1]
+            if not np.isnan(left) and not np.isnan(right):
+                if left < right:
+                    self.zone -= 1
+                elif right < left:
+                    self.zone += 1
+
+# Create strings
+strings = [EntropicString(dim=random.randint(3, 10), zone=random.randint(0, 9)) for _ in range(20)]
+
+# Run simulation
+for t_idx, t_val in enumerate(time):
+    observer.move()
+    observer_log.append((t_idx, observer.dimension, observer.zone))
+    for dim in range(NUM_DIMENSIONS):
+        for zone in range(NUM_ZONES):
+            current_entropy = entropy_field[dim, zone]
+            updated_entropy = entropy_update(dim, current_entropy, t_val, zone)
+            entropy_field[dim, zone] = updated_entropy
+            history[t_idx, dim, zone] = updated_entropy
+    for string in strings:
+        string.update()
+
+# Calculate variance for each dimension
+for dim in range(NUM_DIMENSIONS):
+    entropy_variance[dim] = np.nanvar(history[:, dim, :])
+
+# Plot entropy variance per dimension
+plt.figure(figsize=(12, 5))
+plt.bar(range(1, 12), entropy_variance)
+plt.title("Entropy Variance Per Dimension (Purification Phase Enabled)")
+plt.xlabel("Dimension")
+plt.ylabel("Variance")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+# Report string states
+for i, s in enumerate(strings):
+    print(f"String {i+1} - Dimension {s.dim+1} - Zone {s.zone} - Final State: {s.state}")
+
+# Report Observer Trail
+print("\nObserver Movement Log:")
+for entry in observer_log:
+    print(f"[Time {entry[0]}] Observer in Dim {entry[1]+1}, Zone {entry[2]}")
+
+# Report string encounters with observer
+print("\nString Encounters with Observer:")
+for enc in string_encounters:
+    print(f"Encounter at Dim {enc[0]+1}, Zone {enc[1]} - Entropy: {enc[2]:.2f}, State: {enc[3]}")
